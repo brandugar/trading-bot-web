@@ -1,9 +1,8 @@
-
 name: Daily Bot Trigger
 
 on:
   schedule:
-    - cron: '0 9 * * *'
+    - cron: "0 9 * * *"
   workflow_dispatch:
 
 jobs:
@@ -12,4 +11,4 @@ jobs:
     steps:
       - name: Llamar bot en Render
         run: |
-          curl --silent https://TU-NOMBRE-RENDER.onrender.com/analizar?activos=BTC-USD,ETH-USD,AAPL,TSLA
+          curl --silent https://trading-bot-web.onrender.com/analizar?activos=BTC-USD,ETH-USD,AAPL,TSLA
