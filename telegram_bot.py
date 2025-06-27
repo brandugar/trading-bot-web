@@ -68,8 +68,13 @@ def escuchar():
                 texto = msg.get("text", "").lower()
                 chat_id = msg["chat"]["id"]
 
-                if texto.startswith("/"):
+                if texto.lower() in COMANDOS:
                     procesar_comando(texto, chat_id)
+                else:
+                    requests.get(f"{URL}/sendMessage", params={
+                        "chat_id": chat_id,
+                        "text": "⚠️ Comando no reconocido. Usa /btc, /eth, /aapl, etc."
+                    })
 
             time.sleep(5)
 
