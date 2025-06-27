@@ -2,7 +2,7 @@ name: Escuchar comandos Telegram
 
 on:
   schedule:
-    - cron: "*/45 * * * *" # Cada 45 minutos
+    - cron: "*/5 * * * *" # Cada 5 minutos
   workflow_dispatch:
 
 jobs:

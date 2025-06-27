@@ -54,36 +54,38 @@ def procesar_comando(texto, chat_id):
         })
 
 
-def escuchar():
+def escuchar(duracion_maxima=5 * 60):  # 5 minutos por defecto
     global OFFSET
     inicio = time.time()
-    duracion_maxima = 2 * 60  # 2 minutos en segundos
 
-    while True:
-        if time.time() - inicio > duracion_maxima:
-            print("⏰ Tiempo límite alcanzado. Saliendo del listener...")
-            break
-
+    while time.time() - inicio < duracion_maxima:
         try:
-            res = requests.get(f"{URL}/getUpdates",
-                               params={"timeout": 10, "offset": OFFSET})
+            res = requests.get(
+                f"{URL}/getUpdates",
+                params={"timeout": 10, "offset": OFFSET},
+                timeout=15  # Evita bloqueos eternos
+            )
+            res.raise_for_status()
             data = res.json()
 
-            for update in data["result"]:
+            for update in data.get("result", []):
                 OFFSET = update["update_id"] + 1
-                msg = update["message"]
+                msg = update.get("message", {})
                 texto = msg.get("text", "").lower()
-                chat_id = msg["chat"]["id"]
+                chat_id = msg.get("chat", {}).get("id")
 
-                if texto.startswith("/"):
+                if texto.startswith("/") and chat_id:
                     procesar_comando(texto, chat_id)
 
+        except requests.exceptions.RequestException as e:
+            print(f"⚠️ Error de red: {e}")
+            time.sleep(5)
+        except Exception as e:
+            print(f"❌ Error inesperado: {e}")
             time.sleep(5)
 
-        except Exception as e:
-            print("⚠️ Error en listener:", e)
-            time.sleep(10)
+        time.sleep(2)  # Delay para no saturar la API
 
 
 if __name__ == "__main__":
-    escuchar()
+    escuchar()  # Por defecto escucha por 5 minutos
