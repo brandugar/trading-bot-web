@@ -11,4 +11,4 @@ jobs:
     steps:
       - name: Llamar bot en Render
         run: |
-          curl --silent https://trading-bot-web.onrender.com/analizar?activos=BTC-USD,ETH-USD,AAPL,TSLA
+          curl --silent "https://trading-bot-web-7ooa.onrender.com/analizar?activos=BTC-USD,ETH-USD,SOL-USD,AVAX-USD,LINK-USD,AAPL,MSFT,GOOGL,AMZN,NVDA,TSLA,QQQ,VTI,ARKK,VT,GLD,SLV,PLTR,SMCI,AMD,MSTR,COIN,MELI,SE"
