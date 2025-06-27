@@ -3,7 +3,7 @@ services:
     name: trading-bot-web
     runtime: python
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn app:app"
+    startCommand: "gunicorn --timeout 180 app:app"
     envVars:
       - key: BOT_TOKEN
         sync: false

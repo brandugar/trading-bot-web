@@ -11,18 +11,12 @@ from ta.momentum import RSIIndicator
 
 app = Flask(__name__)
 
-activos_full = [
-  "BTC-USD", "ETH-USD", "SOL-USD", "AVAX-USD", "LINK-USD",
-  "AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "TSLA",
-  "QQQ", "VTI", "ARKK", "VT",
-  "GLD", "SLV",
-  "PLTR", "SMCI", "AMD",
-  "MSTR", "COIN",
-  "MELI", "SE"
-]
+activos_full = ["BTC-USD", "ETH-USD", "SOL-USD", "AAPL", "TSLA", "NVDA",
+                "QQQ", "ARKK", "GLD", "MSTR", "PLTR"]  # Lista de activos a analizar
 
 bot_token = os.getenv("BOT_TOKEN")
 chat_id = os.getenv("CHAT_ID")
+
 
 def analizar_activo(activo):
     df = yf.download(activo, period="6mo", interval="1d", auto_adjust=True)
@@ -84,9 +78,11 @@ MACD: {macd_sig}
 
     return mensaje, buf, f"{activo}.png"
 
+
 @app.route('/')
 def home():
     return "Bot activo"
+
 
 @app.route('/analizar')
 def analizar():
