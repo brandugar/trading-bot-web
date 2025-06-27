@@ -1,0 +1,13 @@
+
+services:
+  - type: web
+    name: trading-bot-server
+    runtime: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn app:app"
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: CHAT_ID
+        sync: false
+    plan: free
