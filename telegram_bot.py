@@ -104,7 +104,7 @@ def obtener_precio(simbolo):
 
 
 # Escucha actualizaciones de Telegram
-def escuchar(duracion_maxima=5 * 60):  # 5 minutos por defecto
+def escuchar(duracion_maxima=6 * 60):  # 6 minutos por defecto
     global OFFSET
     inicio = time.time()
 
