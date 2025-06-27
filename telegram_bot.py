@@ -56,7 +56,14 @@ def procesar_comando(texto, chat_id):
 
 def escuchar():
     global OFFSET
+    inicio = time.time()
+    duracion_maxima = 2 * 60  # 2 minutos en segundos
+
     while True:
+        if time.time() - inicio > duracion_maxima:
+            print("⏰ Tiempo límite alcanzado. Saliendo del listener...")
+            break
+
         try:
             res = requests.get(f"{URL}/getUpdates",
                                params={"timeout": 10, "offset": OFFSET})
@@ -68,18 +75,13 @@ def escuchar():
                 texto = msg.get("text", "").lower()
                 chat_id = msg["chat"]["id"]
 
-                if texto.lower() in COMANDOS:
+                if texto.startswith("/"):
                     procesar_comando(texto, chat_id)
-                else:
-                    requests.get(f"{URL}/sendMessage", params={
-                        "chat_id": chat_id,
-                        "text": "⚠️ Comando no reconocido. Usa /btc, /eth, /aapl, etc."
-                    })
 
             time.sleep(5)
 
         except Exception as e:
-            print("Error en listener:", e)
+            print("⚠️ Error en listener:", e)
             time.sleep(10)
 
 
