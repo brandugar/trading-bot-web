@@ -1,3 +1,4 @@
+import yfinance as yf
 import os
 import time
 import requests
@@ -83,13 +84,23 @@ def procesar_comando(texto, chat_id):
 
 
 # Obtener precio de un activo usando yfinance
+
+
 def obtener_precio(simbolo):
     try:
-        data = yf.Ticker(simbolo).info
-        nombre = data.get("shortName", simbolo)
-        precio = round(data.get("regularMarketPrice", 0), 2)
-        cambio = round(data.get("regularMarketChangePercent", 0), 2)
-        volumen = data.get("volume", 0)
+        print(f"🔍 Consultando precio para: {simbolo}")
+        ticker = yf.Ticker(simbolo)
+        info = ticker.info
+
+        # Si info está vacío
+        if not info:
+            print("⚠️ La info está vacía.")
+            return "❌ No se pudo obtener el precio del activo."
+
+        nombre = info.get("shortName", simbolo)
+        precio = round(info.get("regularMarketPrice", 0), 2)
+        cambio = round(info.get("regularMarketChangePercent", 0), 2)
+        volumen = info.get("volume", 0)
 
         mensaje = (
             f"💰 *{nombre}*\n"
@@ -97,9 +108,11 @@ def obtener_precio(simbolo):
             f"📊 Cambio 24h: {cambio}%\n"
             f"🔁 Volumen diario: {volumen:,}"
         )
+        print("✅ Mensaje generado correctamente.")
         return mensaje
+
     except Exception as e:
-        print("⚠️ Error al obtener precio:", e)
+        print(f"❌ Error al obtener precio: {e}")
         return "❌ No se pudo obtener el precio del activo."
 
 
