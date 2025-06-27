@@ -23,6 +23,22 @@ COMANDOS = {
 }
 
 
+# Comandos para obtener precios directamente
+PRECIO_COMANDOS = {
+    "/preciobtc": "BTC-USD",
+    "/precioeth": "ETH-USD",
+    "/precioaapl": "AAPL",
+    "/preciotsla": "TSLA",
+    "/precionvda": "NVDA",
+    "/precioqqq": "QQQ",
+    "/precioarkk": "ARKK",
+    "/preciogld": "GLD",
+    "/preciomstr": "MSTR",
+    "/preciopltr": "PLTR",
+}
+
+
+# Responde al usuario con un mensaje y una imagen (si aplica)
 def responder(chat_id, mensaje, imagen, nombre_archivo):
     requests.get(f"{URL}/sendMessage", params={
         "chat_id": chat_id, "text": mensaje
@@ -35,25 +51,59 @@ def responder(chat_id, mensaje, imagen, nombre_archivo):
                       )
 
 
+# Procesa el comando recibido
 def procesar_comando(texto, chat_id):
-    simbolo = COMANDOS.get(texto.lower())
-    if not simbolo:
+    texto = texto.lower()
+
+    if texto in COMANDOS:
+        simbolo = COMANDOS[texto]
+        mensaje, imagen, nombre = analizar_activo(simbolo)
+        if mensaje:
+            responder(chat_id, mensaje, imagen, nombre)
+        else:
+            requests.get(f"{URL}/sendMessage", params={
+                "chat_id": chat_id,
+                "text": f"❌ No se pudo analizar {simbolo}. Intenta más tarde."
+            })
+
+    elif texto in PRECIO_COMANDOS:
+        simbolo = PRECIO_COMANDOS[texto]
+        mensaje = obtener_precio(simbolo)
         requests.get(f"{URL}/sendMessage", params={
             "chat_id": chat_id,
-            "text": "⚠️ Comando no reconocido. Usa /btc, /eth, /aapl, etc."
+            "text": mensaje,
+            "parse_mode": "Markdown"
         })
-        return
 
-    mensaje, imagen, nombre = analizar_activo(simbolo)
-    if mensaje:
-        responder(chat_id, mensaje, imagen, nombre)
     else:
         requests.get(f"{URL}/sendMessage", params={
             "chat_id": chat_id,
-            "text": f"❌ No se pudo analizar {simbolo}. Intenta más tarde."
+            "text": "⚠️ Comando no reconocido. Usa /btc, /preciobtc, etc."
         })
 
 
+# Obtener precio de un activo usando yfinance
+def obtener_precio(simbolo):
+    try:
+        data = yf.Ticker(simbolo).info
+        nombre = data.get("shortName", simbolo)
+        precio = round(data.get("regularMarketPrice", 0), 2)
+        cambio = round(data.get("regularMarketChangePercent", 0), 2)
+        volumen = data.get("volume", 0)
+
+        mensaje = (
+            f"💰 *{nombre}*\n"
+            f"📈 Precio actual: ${precio:,}\n"
+            f"📊 Cambio 24h: {cambio}%\n"
+            f"🔁 Volumen diario: {volumen:,}"
+        )
+        return mensaje
+    except Exception as e:
+        print("⚠️ Error al obtener precio:", e)
+        return "❌ No se pudo obtener el precio del activo."
+
+
+# Escucha actualizaciones de Telegram
 def escuchar(duracion_maxima=5 * 60):  # 5 minutos por defecto
     global OFFSET
     inicio = time.time()
