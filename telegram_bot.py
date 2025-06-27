@@ -21,6 +21,7 @@ COMANDOS = {
     "/gld": "GLD",
     "/mstr": "MSTR",
     "/pltr": "PLTR",
+    "/activos": None  # comando informativo
 }
 
 
@@ -56,6 +57,17 @@ def responder(chat_id, mensaje, imagen, nombre_archivo):
 def procesar_comando(texto, chat_id):
     texto = texto.lower()
 
+    if texto == "/activos":
+        lista = "\n".join(
+            [f"{cmd} → {sym}" for cmd, sym in COMANDOS.items() if sym])
+        mensaje = f"📌 *Activos disponibles para análisis:*\n\n{lista}"
+        requests.get(f"{URL}/sendMessage", params={
+            "chat_id": chat_id,
+            "text": mensaje,
+            "parse_mode": "Markdown"
+        })
+        return
+
     if texto in COMANDOS:
         simbolo = COMANDOS[texto]
         mensaje, imagen, nombre = analizar_activo(simbolo)
@@ -79,7 +91,7 @@ def procesar_comando(texto, chat_id):
     else:
         requests.get(f"{URL}/sendMessage", params={
             "chat_id": chat_id,
-            "text": "⚠️ Comando no reconocido. Usa /btc, /preciobtc, etc."
+            "text": "⚠️ Comando no reconocido. Usa /activos para ver la lista disponible."
         })
 
 
